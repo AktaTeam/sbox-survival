@@ -7,3 +7,8 @@ obj/
 .cache/
 compiled/
 .claude/settings.local.json
+.sbox/
+*.scene_c
+*.scene_d
+Code/*.csproj
+*.slnx
