@@ -1,4 +1,15 @@
 {
+  "editor.formatOnSave": true,
+  "editor.tabSize": 4,
+  "editor.insertSpaces": false,
+  "files.eol": "\r\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
+  },
+  "dotnet.server.useOmnisharp": false,
+  "omnisharp.useModernNet": true,
   "files.associations": {
     "*.shader": "slang",
     "*.hlsl": "slang"

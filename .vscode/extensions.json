@@ -1,6 +1,12 @@
 {
   "recommendations": [
     "ms-dotnettools.csdevkit",
+    "ms-dotnettools.csharp",
+    "anthropic.claude-code",
+    "eamodio.gitlens",
+    "github.vscode-pull-request-github",
+    "editorconfig.editorconfig",
+    "usernamehw.errorlens",
     "shader-slang.slang-language-extension"
   ]
 }
