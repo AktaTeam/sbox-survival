@@ -14,7 +14,7 @@ There is no `dotnet build` or test runner here — s&box compiles `Code/` itself
 
 - Open the project: launch s&box, then **Open Project → `sbox-survival.sbproj`**.
 - Compile after edits: Ctrl+B in the s&box editor (or save a `.cs` file — hot reload picks it up).
-- Run: open `Scenes/main.scene` (referenced as `DefaultScene` in the .sbproj — create it in-editor; it is not in the repo) and press Play.
+- Run: open `scenes/main.scene` (referenced as `StartupScene` in the .sbproj) and press Play.
 - Edit `GameResource` instances (e.g. `ItemDefinition` `.item` files) through the editor's resource inspector, not by hand.
 
 ## Architecture
