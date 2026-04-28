@@ -70,3 +70,17 @@ The project is **multiplayer** (`Metadata.GameNetworkType: Multiplayer`, `MaxPla
 - Mutate `SurvivalStats` only through its public methods. Direct field assignment defeats clamping and the `OnDied` event.
 - `OnFixedUpdate` for physics/simulation drains and movement; `OnUpdate` for input, camera, and timers. Don't sample `Input` from `OnFixedUpdate`.
 - Components find their siblings via `[Property]` references wired in the editor, with a `??= GetComponent<T>()` fallback in `OnStart` for resilience. Avoid `Scene.GetAllComponents` for player-local systems.
+
+## Available Skills
+
+Project-scoped Claude Code skills in `.claude/skills/`:
+
+- **commit-and-push** (manual): Stage, Conventional Commits message, push to main.
+- **move-asset** (manual): Move s&box assets safely with compiled artifacts and reference updates.
+- **audit-network** (auto): Read-only audit of C# components for multiplayer compliance.
+- **add-component** (manual): Scaffold a new s&box Component with project conventions.
+- **session-start** (manual): Quick recap of project state at session start.
+- **sync-context** (manual): Generate a copy-paste summary to brief Claude chat.
+- **fix-from-error** (auto): Diagnose s&box errors and propose patches.
+
+Manual skills require explicit user invocation (`/skill-name`). Auto skills can trigger on context match.
