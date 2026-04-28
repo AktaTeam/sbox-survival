@@ -48,7 +48,20 @@ To add a new item *category* or *behavior* (e.g. armor stats, durability), exten
 - Player spawning from `PlayerPrefab` at `SpawnPoint` on `OnStart`.
 - Day/night clock (`TimeOfDay`, `IsNight`) advanced in `OnUpdate`. Other systems should *read* `GameManager.Current.TimeOfDay` rather than running their own clocks.
 
-There is no networking layer — `Metadata.GameNetworkType` in the .sbproj is `Singleplayer`. Don't add `[Sync]` / RPC plumbing without changing that first.
+### Networking
+
+The project is **multiplayer** (`Metadata.GameNetworkType: Multiplayer`, `MaxPlayers: 16`, `LaunchMode: QuickPlay`). Components must be designed network-aware from the start:
+
+- Synchronized state uses `[Sync]` on properties that all clients need to observe (health, position, equipped tool, etc.).
+- Distinguish ownership with `IsProxy` — the owning client/host returns `false`; remote replicas return `true`. Input sampling, authoritative simulation, and one-shot side effects must be gated on `!IsProxy`.
+- RPC routing: `[Rpc.Broadcast]` to fan out to everyone, `[Rpc.Host]` to send a request to the host (authoritative writes), `[Rpc.Owner]` to target the object's owner (e.g. local-only feedback).
+
+**Engine limits to know before scaling up:**
+- `MaxPlayers` is capped at 64 for stable play on premium hardware (256 is the theoretical engine ceiling but unstable in practice). 16 is our prototype target — adjust upward only after profiling.
+- World bounds are ±32768 units; lighting bake is unavailable beyond that.
+- 1 unit ≈ 2.54 cm — keep movement speeds, hitboxes, and ranges in source units.
+
+**Phase C — pending refactor:** `Player`, `SurvivalStats`, `Inventory`, and `Interactor` were authored single-player and need network adaptation (host-authority on stats and inventory, `IsProxy` gates on input/camera, `[Sync]` on observable state) **before** they are attached to the player prefab.
 
 ## Conventions specific to this codebase
 
