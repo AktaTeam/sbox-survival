@@ -1,0 +1,62 @@
+{
+  "Title": "Sbox Survival",
+  "Type": "game",
+  "Org": "local",
+  "Ident": "sbox_survival",
+  "Schema": 1,
+  "ResourcePaths": [
+    "/Assets/",
+    "/Scenes/"
+  ],
+  "CodePath": "/Code/",
+  "PackageReferences": [],
+  "EditorReferences": null,
+  "Tags": "survival singleplayer",
+  "Summary": "Single-player survival game built on s&box.",
+  "Description": "Manage hunger, thirst, stamina, and temperature while harvesting resources to stay alive.",
+  "Compiler": {
+    "RootNamespace": "SboxSurvival",
+    "DefineConstants": "SANDBOX;ADDON;DEBUG",
+    "NoWarn": "1701;1702;1591;",
+    "WarningsAsErrors": "",
+    "Whitelist": true,
+    "AssemblyReferences": [],
+    "IgnoreFolders": [
+      "editor",
+      "unittest"
+    ],
+    "DistinctAssemblyReferences": []
+  },
+  "PackageSettings": [],
+  "Collision": {
+    "Defaults": {
+      "world": "Collide",
+      "solid": "Collide",
+      "trigger": "Trigger",
+      "player": "Collide"
+    }
+  },
+  "Tiers": {},
+  "RenderSettings": {
+    "FogVolume": null,
+    "Tonemap": null
+  },
+  "PhysicsSubsteps": 1,
+  "DefaultScene": "scenes/main.scene",
+  "DefaultNetworkOrchestrator": null,
+  "Metadata": {
+    "MaxPlayers": 1,
+    "MinPlayers": 1,
+    "GameNetworkType": "Singleplayer",
+    "MapList": [],
+    "RankType": "None",
+    "PerMapRanking": false,
+    "LeaderboardType": "None",
+    "ProjectTemplate": null,
+    "GameCategory": "Survival",
+    "ControlModes": {
+      "Keyboard": true,
+      "Gamepad": false
+    }
+  }
+}
