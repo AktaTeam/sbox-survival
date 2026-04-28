@@ -1,4 +1,9 @@
 {
+  // ┌─────────────────────────────────────────────────────────────────┐
+  // │ SHARED PROJECT EXTENSIONS — DO NOT STRIP                        │
+  // │ If items disappear, restore via: git restore .vscode/           │
+  // │ Last verified: 2026-04-28                                       │
+  // └─────────────────────────────────────────────────────────────────┘
   "recommendations": [
     "ms-dotnettools.csdevkit",
     "ms-dotnettools.csharp",

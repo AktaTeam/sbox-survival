@@ -1,4 +1,11 @@
 {
+  // ┌─────────────────────────────────────────────────────────────────┐
+  // │ SHARED PROJECT CONFIG — DO NOT STRIP                            │
+  // │ If C# DevKit or another extension removes keys, restore via:    │
+  // │   git restore .vscode/                                          │
+  // │ See CLAUDE.md "Available Skills" for project conventions.       │
+  // │ Last verified: 2026-04-28                                       │
+  // └─────────────────────────────────────────────────────────────────┘
   "editor.formatOnSave": true,
   "editor.tabSize": 4,
   "editor.insertSpaces": false,
