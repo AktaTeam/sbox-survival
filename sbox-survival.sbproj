@@ -16,7 +16,7 @@
     "GameNetworkType": "Multiplayer",
     "LaunchMode": "QuickPlay",
     "TickRate": 50,
-    "StartupScene": "scenes/main.scene",
+    "StartupScene": "Assets/Scenes/main.scene",
     "MapList": [],
     "RankType": "None",
     "PerMapRanking": false,
