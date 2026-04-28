@@ -3,6 +3,9 @@ using System;
 
 namespace SboxSurvival;
 
+// TODO(multi): Callers of the removed TrySpendStamina (e.g. Player.cs sprint logic)
+// must migrate to: CanAffordStamina (local check) + DrainStamina (host RPC).
+// Audit Player.cs next pass to complete the migration.
 public sealed class SurvivalStats : Component
 {
 	[Property, Range( 1f, 200f )] public float MaxHealth { get; set; } = 100f;
@@ -15,18 +18,23 @@ public sealed class SurvivalStats : Component
 	[Property] public float StaminaRegenPerSecond { get; set; } = 8f;
 	[Property] public float StarvationDamagePerSecond { get; set; } = 1f;
 
-	public float Health { get; private set; }
-	public float Hunger { get; private set; }
-	public float Thirst { get; private set; }
-	public float Stamina { get; private set; }
+	[Sync] public float Health { get; private set; }
+	[Sync] public float Hunger { get; private set; }
+	[Sync] public float Thirst { get; private set; }
+	[Sync] public float Stamina { get; private set; }
 
 	public bool IsAlive => Health > 0f;
 	public bool CanSprint => Stamina > 5f && IsAlive;
 
+	// TODO(multi): Currently fires only on host (ApplyDamage is [Rpc.Host]).
+	// When a consumer subscribes (death screen, ragdoll, killfeed), wrap this in
+	// an [Rpc.Broadcast] dispatcher so all clients receive the death signal.
 	public event Action OnDied;
 
 	protected override void OnStart()
 	{
+		if ( IsProxy ) return;
+
 		Health = MaxHealth;
 		Hunger = MaxHunger;
 		Thirst = MaxThirst;
@@ -35,6 +43,7 @@ public sealed class SurvivalStats : Component
 
 	protected override void OnFixedUpdate()
 	{
+		if ( IsProxy ) return;
 		if ( !IsAlive ) return;
 
 		Hunger = MathF.Max( 0f, Hunger - HungerDrainPerSecond * Time.Delta );
@@ -46,6 +55,13 @@ public sealed class SurvivalStats : Component
 			ApplyDamage( StarvationDamagePerSecond * Time.Delta );
 	}
 
+	private bool IsCallerAuthorized()
+	{
+		if ( Rpc.Caller.IsHost ) return true;
+		return Rpc.Caller.CanRefreshObjects && Rpc.Caller == Network.Owner;
+	}
+
+	[Rpc.Host]
 	public void ApplyDamage( float amount )
 	{
 		if ( !IsAlive ) return;
@@ -53,16 +69,53 @@ public sealed class SurvivalStats : Component
 		if ( Health <= 0f ) OnDied?.Invoke();
 	}
 
-	public void Heal( float amount ) => Health = MathF.Min( MaxHealth, Health + amount );
-	public void Eat( float amount ) => Hunger = MathF.Min( MaxHunger, Hunger + amount );
-	public void Drink( float amount ) => Thirst = MathF.Min( MaxThirst, Thirst + amount );
-
-	public void DrainStamina( float amount ) => Stamina = MathF.Max( 0f, Stamina - amount );
-
-	public bool TrySpendStamina( float amount )
+	[Rpc.Host]
+	public void Heal( float amount )
 	{
-		if ( Stamina < amount ) return false;
-		Stamina -= amount;
-		return true;
+		if ( !IsCallerAuthorized() )
+		{
+			Log.Warning( $"Unauthorized Heal from {Rpc.Caller.DisplayName}" );
+			return;
+		}
+		if ( !IsAlive ) return;
+		Health = MathF.Min( MaxHealth, Health + amount );
+	}
+
+	[Rpc.Host]
+	public void Eat( float amount )
+	{
+		if ( !IsCallerAuthorized() )
+		{
+			Log.Warning( $"Unauthorized Eat from {Rpc.Caller.DisplayName}" );
+			return;
+		}
+		if ( !IsAlive ) return;
+		Hunger = MathF.Min( MaxHunger, Hunger + amount );
+	}
+
+	[Rpc.Host]
+	public void Drink( float amount )
+	{
+		if ( !IsCallerAuthorized() )
+		{
+			Log.Warning( $"Unauthorized Drink from {Rpc.Caller.DisplayName}" );
+			return;
+		}
+		if ( !IsAlive ) return;
+		Thirst = MathF.Min( MaxThirst, Thirst + amount );
+	}
+
+	// Local read for client-side prediction. Use before calling DrainStamina.
+	public bool CanAffordStamina( float amount ) => Stamina >= amount;
+
+	[Rpc.Host]
+	public void DrainStamina( float amount )
+	{
+		if ( !IsCallerAuthorized() )
+		{
+			Log.Warning( $"Unauthorized DrainStamina from {Rpc.Caller.DisplayName}" );
+			return;
+		}
+		Stamina = MathF.Max( 0f, Stamina - amount );
 	}
 }
