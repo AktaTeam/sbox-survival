@@ -1,0 +1,65 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using System.Linq;
+@using SboxSurvival;
+@inherits PanelComponent
+
+<root>
+    <div class="vitals-hud">
+        <div class="vital health">
+            <span class="label">HP</span>
+            <span class="value">@FormatValue(Stats?.Health, Stats?.MaxHealth)</span>
+        </div>
+        <div class="vital hunger">
+            <span class="label">🍖</span>
+            <span class="value">@FormatValue(Stats?.Hunger, Stats?.MaxHunger)</span>
+        </div>
+        <div class="vital thirst">
+            <span class="label">💧</span>
+            <span class="value">@FormatValue(Stats?.Thirst, Stats?.MaxThirst)</span>
+        </div>
+        <div class="vital stamina">
+            <span class="label">⚡</span>
+            <span class="value">@FormatValue(Stats?.Stamina, Stats?.MaxStamina)</span>
+        </div>
+    </div>
+</root>
+
+@code {
+    /// <summary>
+    /// Reference to the local player's SurvivalStats component.
+    /// Auto-resolved at OnStart if not wired manually in inspector.
+    /// </summary>
+    [Property]
+    public SurvivalStats Stats { get; set; }
+
+    protected override void OnStart()
+    {
+        // Auto-resolve: find the local (owner-authoritative) player's stats.
+        // Convention: !IsProxy is consistent with the rest of the codebase
+        // (SurvivalStats.cs, SprintStaminaController.cs).
+        Stats ??= Scene.GetAllComponents<SurvivalStats>()
+            .FirstOrDefault( s => !s.IsProxy );
+    }
+
+    protected override int BuildHash()
+    {
+        // CRITICAL: include EVERY value displayed in the template,
+        // otherwise the UI freezes on stale values.
+        return System.HashCode.Combine(
+            Stats?.Health,
+            Stats?.Hunger,
+            Stats?.Thirst,
+            Stats?.Stamina
+        );
+    }
+
+    /// <summary>
+    /// Formats a vital value as "current/max" with safe null handling.
+    /// </summary>
+    private string FormatValue( float? current, float? max )
+    {
+        if ( current is null || max is null ) return "—";
+        return $"{current.Value:F0}/{max.Value:F0}";
+    }
+}

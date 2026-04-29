@@ -1,0 +1,42 @@
+.vitals-hud {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+    font-family: Poppins;
+
+    .vital {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 16px;
+        background-color: rgba( black, 0.6 );
+        border-radius: 6px;
+        min-width: 140px;
+
+        .label {
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            text-stroke: 1px black;
+            min-width: 32px;
+        }
+
+        .value {
+            font-size: 18px;
+            font-weight: 500;
+            color: white;
+            text-stroke: 1px black;
+            margin-left: auto;
+        }
+    }
+
+    .vital.health .label { color: rgba( red, 0.9 ); }
+    .vital.hunger .label { color: rgba( orange, 0.9 ); }
+    .vital.thirst .label { color: rgba( cyan, 0.9 ); }
+    .vital.stamina .label { color: rgba( yellow, 0.9 ); }
+}
