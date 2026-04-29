@@ -354,6 +354,42 @@
           "RemoveUnownedItems": true,
           "Source": "OwnerConnection",
           "WorkshopItems": []
+        },
+        {
+          "__type": "SboxSurvival.SprintStaminaController",
+          "__guid": "ec5091c9-055e-46e0-a078-3b790fcbd649",
+          "__enabled": true,
+          "Flags": 0,
+          "Controller": null,
+          "JumpStaminaCost": 10,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "StaminaDrainPerSecond": 12,
+          "Stats": null
+        },
+        {
+          "__type": "SboxSurvival.SurvivalStats",
+          "__guid": "f6809a4b-2a03-442a-928d-684619444f13",
+          "__enabled": true,
+          "Flags": 0,
+          "HungerDrainPerSecond": 0.15,
+          "MaxHealth": 100,
+          "MaxHunger": 100,
+          "MaxStamina": 100,
+          "MaxThirst": 100,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "StaminaRegenPerSecond": 8,
+          "StarvationDamagePerSecond": 1,
+          "ThirstDrainPerSecond": 0.22
         }
       ],
       "Children": [
