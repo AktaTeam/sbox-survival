@@ -14,7 +14,7 @@ There is no `dotnet build` or test runner here — s&box compiles `Code/` itself
 
 - Open the project: launch s&box, then **Open Project → `sbox-survival.sbproj`**.
 - Compile after edits: Ctrl+B in the s&box editor (or save a `.cs` file — hot reload picks it up).
-- Run: open `scenes/main.scene` (referenced as `StartupScene` in the .sbproj) and press Play.
+- Run: open `Assets/Scenes/main.scene` (referenced as `StartupScene` in the .sbproj) and press Play.
 - Edit `GameResource` instances (e.g. `ItemDefinition` `.item` files) through the editor's resource inspector, not by hand.
 
 ## Architecture
@@ -25,12 +25,13 @@ Scene + Component model (similar to Unity), not the legacy s&box Entity system. 
 
 The player is **multiple components on one GameObject**, deliberately decomposed so each system is testable and replaceable:
 
-- `Player` (`Code/Player/Player.cs`) — input, camera look, locomotion. Asks `SurvivalStats` whether sprinting/jumping is allowed and reports stamina cost back. Does **not** own health or hunger.
-- `SurvivalStats` (`Code/Player/SurvivalStats.cs`) — single source of truth for health, hunger, thirst, stamina. Exposes `Eat/Drink/Heal/ApplyDamage/TrySpendStamina` so other systems mutate stats only through this surface. Drains hunger/thirst on `OnFixedUpdate` and applies starvation damage when either reaches zero.
+- `PlayerController` (native s&box component) — input sampling, camera look, locomotion, jump, run. No project-side code; configured via inspector tunables on the player GameObject.
+- `SprintStaminaController` (`Code/Player/SprintStaminaController.cs`) — Bridges PlayerController (native) to SurvivalStats via PlayerController.IEvents. Drains stamina on sprint and jump.
+- `SurvivalStats` (`Code/Player/SurvivalStats.cs`) — single source of truth for health, hunger, thirst, stamina. Exposes `Eat/Drink/Heal/ApplyDamage/CanAffordStamina/DrainStamina` so other systems mutate stats only through this surface (host-authoritative via [Rpc.Host] for mutators). Drains hunger/thirst on `OnFixedUpdate` and applies starvation damage when either reaches zero.
 - `Inventory` (`Code/Player/Inventory.cs`) — fixed-slot stack-based inventory keyed on `ItemDefinition`. `TryAdd` fills existing stacks first, then empty slots; returns `false` if items couldn't all fit.
-- `Interactor` (`Code/World/Interactor.cs`) — eye-ray tracer that translates `attack1` into harvest calls on whatever `ResourceNode` it hits. The interactor holds the equipped `ToolKind` and swing damage; `Player` does not interact with the world directly.
+- `Interactor` (`Code/World/Interactor.cs`) — eye-ray tracer that translates `attack1` into harvest calls on whatever `ResourceNode` it hits. The interactor holds the equipped `ToolKind` and swing damage; the player GameObject does not interact with the world directly through other components.
 
-When adding a new player capability (e.g. crafting, equipment), prefer a new `Component` over expanding `Player`. Wire it up through `[Property]` references rather than `Scene.GetAllComponents<...>()` lookups.
+When adding a new player capability (e.g. crafting, equipment), prefer a new `Component` over expanding existing ones (composition over inheritance). Wire it up through `[Property]` references rather than `Scene.GetAllComponents<...>()` lookups.
 
 ### World objects
 
@@ -61,7 +62,12 @@ The project is **multiplayer** (`Metadata.GameNetworkType: Multiplayer`, `MaxPla
 - World bounds are ±32768 units; lighting bake is unavailable beyond that.
 - 1 unit ≈ 2.54 cm — keep movement speeds, hitboxes, and ranges in source units.
 
-**Phase C — pending refactor:** `Player`, `SurvivalStats`, `Inventory`, and `Interactor` were authored single-player and need network adaptation (host-authority on stats and inventory, `IsProxy` gates on input/camera, `[Sync]` on observable state) **before** they are attached to the player prefab.
+**Phase C — networking refactor status:**
+- ✅ `SurvivalStats` — refactored to multiplayer (commit 331b18b: [Sync] state, [Rpc.Host] mutators with caller authorization).
+- ✅ `Player` (legacy) — replaced by `SprintStaminaController` (commits c63f52d / 2fd64d0). PlayerController native handles movement/camera/input; SprintStaminaController bridges to SurvivalStats via IEvents.
+- 🟡 `Inventory` — not yet audited. Needs network adaptation before features depending on it (item drops, container interactions) are built.
+- 🟡 `Interactor` — not yet audited. Needs Client → Rpc.Host pattern for harvest calls, plus `ResourceNode` host-authoritative damage.
+- 🟡 `ResourceNode` (`Code/World/`) — not yet audited. Single-source-of-truth health on host, damage RPCs from any client tool swing.
 
 ## Conventions specific to this codebase
 
