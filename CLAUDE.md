@@ -69,6 +69,16 @@ The project is **multiplayer** (`Metadata.GameNetworkType: Multiplayer`, `MaxPla
 - 🟡 `Interactor` — not yet audited. Needs Client → Rpc.Host pattern for harvest calls, plus `ResourceNode` host-authoritative damage.
 - 🟡 `ResourceNode` (`Code/World/`) — not yet audited. Single-source-of-truth health on host, damage RPCs from any client tool swing.
 
+## Recommended VS Code Extensions
+
+The .vscode/ folder is gitignored because s&box editor rewrites it from its own template on each session. If you want VSCode IntelliSense and shader support for this project, install these extensions manually:
+
+- shader-slang.slang-language-extension — Slang shader support (s&box uses Slang for shaders)
+- ms-dotnettools.csdevkit — C# Dev Kit (s&box's recommended C# IDE extension)
+- anthropic.claude-code — Claude Code agentic coding (project workflow)
+
+Project-wide formatting rules are defined in `.editorconfig` and applied automatically by any editor that supports the standard.
+
 ## Conventions specific to this codebase
 
 - Namespace is `SboxSurvival` (set in `sbox-survival.sbproj` `RootNamespace`); every file uses `namespace SboxSurvival;` (file-scoped).

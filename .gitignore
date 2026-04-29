@@ -12,3 +12,6 @@ compiled/
 *.scene_d
 Code/*.csproj
 *.slnx
+
+# IDE config managed by s&box editor (rewrites from template on each session, see commit chore(workspace) of session 2026-04-29)
+.vscode/
